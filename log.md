@@ -28,3 +28,8 @@
 - Результат: оценка 7/10. HIGH: скептик не может запустить ноутбук/SQL (нет jupyter, psql); в цикле ЛР нет шага «отчёт .docx»; ЛР в GUI-инструментах (Visual Paradigm, ELMA, IDEF1X) без ручного шага. MED: 9 из 12 скиллов не по курсам (enterprise-architecture исключает UML/ER), агенты без frontmatter, merge в main при 8 предметах в одной ветке, e-mail в публичном log.md, git в OneDrive.
 - Решения: папка названа `project_audit` (латиница, как имена файлов в репо).
 - Дальше: исправить пункты 1–3 плана из аудита до первой ЛР.
+
+## 2026-09-27 13:36 — аудит: разбор скиллов
+- Сделано: в `project_audit/audit_2026-09-27.md` добавлен раздел 6 «Разбор скиллов по одному» — обоснование по каждому из 12 скиллов проекта и 3 пользовательских.
+- Результат: оставить 5, с оговоркой 1, отложить 1, удалить 5 (enterprise-architecture, requirements-gap-analysis, stakeholder-interview-guide, mvp-scope-cutting, estimation-from-requirements). Пользовательские memory-bank, task, caveman конфликтуют с учётом проекта.
+- Дальше: пользователь правит систему по аудиту.
