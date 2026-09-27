@@ -10,7 +10,7 @@
 
 ## 2026-09-27 13:06 — git
 - Сделано: `git init`, правила git в CLAUDE.md (ветки `main`/`dev`, 1 запись в журнал = 1 коммит, Conventional Commits со scope = предмет), `.gitignore`.
-- Решения: упрощённый GitHub Flow из absolute555/textery без PR — работа одна, ревью не нужно. Автор коммитов: mm-shkurin <trape3977@gmail.com> (локальный config). Материалы курса пушатся в публичный репо — решение пользователя.
+- Решения: упрощённый GitHub Flow из absolute555/textery без PR — работа одна, ревью не нужно. Автор коммитов: mm-shkurin (локальный config). Материалы курса пушатся в публичный репо — решение пользователя.
 - Дальше: работа по предметам в `dev`.
 
 ## 2026-09-27 13:21 — правила работы с материалами
@@ -33,3 +33,12 @@
 - Сделано: в `project_audit/audit_2026-09-27.md` добавлен раздел 6 «Разбор скиллов по одному» — обоснование по каждому из 12 скиллов проекта и 3 пользовательских.
 - Результат: оставить 5, с оговоркой 1, отложить 1, удалить 5 (enterprise-architecture, requirements-gap-analysis, stakeholder-interview-guide, mvp-scope-cutting, estimation-from-requirements). Пользовательские memory-bank, task, caveman конфликтуют с учётом проекта.
 - Дальше: пользователь правит систему по аудиту.
+
+## 2026-09-27 13:45 — исправления по аудиту
+- Сделано: `CLAUDE.md` — шаблон «Карта ЛР N» (блоки «Делает студент руками», «Отчёт», «Проверка запуском», «Вне курса»), шаги «Ручные шаги», «Отчёт», `/defense` в цикле ЛР; разделы «Окружение», «Отчёт», «Стиль текстов»; правило 5 разделяет «выход за курс» и «в материалах нет»; Git — теги `<scope>-lab<N>-submitted` вместо «main = сданные ЛР», OneDrive как принятый риск; «Панель» в README.
+- Сделано: frontmatter у `.claude/agents/lab-skeptic.md` (только Read/Grep/Glob/Bash) и `debugger.md`; скептик проверяет запуск по «Окружению», `.docx`-отчёт, скриншоты ручных шагов; `debugger` — репро без тестов, `why_for_student`. `check-lab`/`debug` вызывают `subagent_type`.
+- Сделано: новые скиллы `start-lab`, `add-material`, `defense`; скрипт `.claude/scripts/docx2txt.py`; Stop-хук `.claude/hooks/check-log.sh` (+ `.claude/settings.json`). Удалены скиллы `enterprise-architecture`, `requirements-gap-analysis`, `stakeholder-interview-guide`, `mvp-scope-cutting`, `estimation-from-requirements`; README и `.claude/THIRD_PARTY.md` обновлены.
+- Сделано: e-mail убран из записи 13:06 — исключение из правила «только дописывать» ради приватности (в метаданных коммитов e-mail остаётся). Раздел 7 «Статус исправлений» в `project_audit/audit_2026-09-27.md`.
+- Результат: хук проверен вручную — изменение `SE/solution/` без `SE/log.md` → код 2 с сообщением; с правкой `log.md` → предмет не упоминается; `stop_hook_active: true` → код 0. `docx2txt.py` проверен на титуле РГР SE.
+- Решения: репозиторий остаётся публичным и в OneDrive (решение пользователя); сдача отмечается тегом (решение пользователя). venv — вне OneDrive, чтобы не синхронизировать тысячи файлов. Вместо отдельного скилла для UML/BPMN/ER — раздел «Ручные шаги» (черновик PlantUML/Mermaid).
+- Дальше: перезапустить Claude Code (подхватить агентов и хук); первая ЛР — через `/start-lab`.

@@ -19,22 +19,39 @@
 
 Правила ведения прогресса и журнала — в [CLAUDE.md](CLAUDE.md). Журнал по репозиторию в целом — [log.md](log.md).
 
+## Панель
+
+Сводка по предметам. Обновлять вместе с `progress.md` предмета, когда меняется «Следующий шаг» или появляется срок. Подробности — в `<Предмет>/progress.md`.
+
+| Предмет | Ближайший срок | Следующий шаг |
+|---|---|---|
+| ProgPractice | ЛР 1–5 — последнее ПЗ (дат нет) | выбрать вариант датасета и подгруппу |
+| SE | 01.09–30.12.26 (методика старая) | заполнить `task.md` |
+| DBMS | не найдено | перенести текст ЛР 1 в `task.md` |
+| WebDev | не найдено | ЛР 1: две HTML-страницы с таблицами |
+| OOAD | — | получить задания |
+| NLP | — | получить задания |
+| DiffEq | — | получить задания |
+| MathSec | — | получить задания |
+
 ## Скиллы Claude (`.claude/skills/`)
+
+Сторонние скиллы — «общие знания» (последняя ступень порядка доверия, CLAUDE.md). Их нотации и методики не подменяют методичку.
 
 | Скилл | Для чего | Где пригодится |
 |---|---|---|
-| `enterprise-architecture` | C4/Structurizr, ArchiMate, TOGAF, arc42, ADR | SE, OOAD |
-| `software-architecture` | Clean Architecture, SOLID, ADR | OOAD, SE |
-| `modern-web-app-architecture` | SPA/SSR, стейт, производительность фронта | WebDev |
-| `stakeholder-interview-guide` | интервью с заказчиком, требования | SE (РГР), ProgPractice (МЕМО) |
-| `non-functional-requirements-elicitation` | нефункциональные требования (ISO 25010) | SE |
-| `requirements-gap-analysis` | «как есть / как надо» | SE (бизнес-процессы) |
-| `ambiguity-detection-in-requirements` | размытые формулировки в ТЗ | SE |
-| `mvp-scope-cutting` | урезать хотелки до MVP | SE |
-| `estimation-from-requirements` | оценка трудоёмкости | SE |
+| `start-lab` | «Карта ЛР N» по материалам → `/check-lab plan` | все, в начале каждой ЛР |
 | `check-lab` | скептик: атака на карту ЛР (`plan`) и проверка решения перед сдачей (`solution`) | все, обязательно перед `готова` |
 | `debug` | поиск причины ошибки в решении | все |
+| `add-material` | новый файл → `notes/` + `INDEX.md` + журнал + коммит | все |
+| `defense` | тренировка защиты: вопросы по одному, оценка ответов | все, перед защитой |
 | `plain` | переобъяснить простыми словами (`/plain`) | защита ЛР |
+| `non-functional-requirements-elicitation` | нефункциональные требования; числа (время отклика и т.п.) помечать как условные | SE (РГР, раздел 1) |
+| `ambiguity-detection-in-requirements` | размытые формулировки — вызывать явно на тексте задания | SE, DBMS, WebDev (разбор заданий) |
+| `modern-web-app-architecture` | структура SPA, состояние. Уклон в React/Next.js, SSR, Core Web Vitals — задание этого не требует; PWA и service worker не покрывает | только WebDev ЛР 2–3 |
+| `software-architecture` | Clean Architecture, SOLID — **не использовать**, пока нет материалов OOAD (курс, судя по пособиям, про UML-модели, а не код) | отложен |
+
+Агенты (`.claude/agents/`): `lab-skeptic` (только чтение), `debugger`. Хук `.claude/hooks/check-log.sh` — не даёт закончить ход, если решение изменено без записи в `log.md`.
 
 ## Сокращения предметов
 

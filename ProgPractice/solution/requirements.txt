@@ -1,0 +1,15 @@
+# Базовое окружение курса (библиотеки из лекций 1–2, см. materials/INDEX.md).
+# pandas < 3: ноутбуки лекций написаны под 2.x.
+# Точные версии проекта фиксируются в ноутбуке: pip list --format=freeze (Лекция 1, ячейки 16–18).
+pandas>=2.2,<3
+numpy
+scipy
+scikit-learn
+matplotlib
+seaborn
+missingno
+openpyxl
+# запуск и проверка ноутбуков
+jupyter
+nbconvert
+ipykernel

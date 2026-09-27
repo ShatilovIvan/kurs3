@@ -19,9 +19,11 @@ does not share the worker's blind spots.
 ## Steps
 1. **Resolve** folder, N, mode. Precondition: `progress.md` has block «Карта ЛР N».
    Missing → build it first (CLAUDE.md «Материалы», rule 2), then continue.
-2. **Spawn 1 agent** (`Agent`, `general-purpose`, foreground). Prompt:
-   > Answer in Russian, TERSE. Read `.claude/agents/lab-skeptic.md` and follow it exactly.
-   > Subject folder: `<Предмет>/`. Lab: N. Mode: <mode>.
+2. **Spawn 1 agent** (`Agent`, `subagent_type: lab-skeptic`, foreground) — read-only by its
+   `tools`. If `lab-skeptic` is not in the agent list (session started before the file was
+   added) — fall back to `general-purpose` with «Read `.claude/agents/lab-skeptic.md` and
+   follow it exactly; do not edit files». Prompt:
+   > Answer in Russian, TERSE. Subject folder: `<Предмет>/`. Lab: N. Mode: <mode>.
    Pass nothing else from this conversation (except the previous findings on a re-run) —
    the fresh view is the point.
 3. **Report** to the user: verdict, HIGH findings first, then MED; defense questions
@@ -33,6 +35,7 @@ does not share the worker's blind spots.
    - Commit `docs(<scope>): skeptic check lab N (<mode>): <verdict>`.
 5. **Route:**
    - `сдавать` / `начинать` → solution: status may go to `готова`; plan: start work.
+     `сдавать` with any acceptance item `not_verified` is invalid — treat as `доработать`.
    - `доработать` → fix findings, then re-run `/check-lab` (same mode).
    - `блок` → do not proceed; show the blocking finding, ask the user.
 
