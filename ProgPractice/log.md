@@ -6,3 +6,8 @@
 - Сделано: скачаны с wiki.pmifi.ru ЛР 1, шаблон `materials/template.ipynb`, 13 вариантов (`materials/variants/`) и датасетов (`materials/datasets/`), лекции 1–2 (`materials/lectures/`). Старые ЛР 6-го семестра → `materials/archive_2025-26_6sem/`.
 - Решения: текущий семестр = ML-трек с вики (по методике 5 сем 2026/27).
 - Дальше: выбрать вариант.
+
+## 2026-09-27 13:21 — индекс материалов
+- Сделано: текст всех PDF/DOCX/DOC → `materials/notes/`, оглавление `materials/INDEX.md` (файлы, сроки, критерии, карта по работам, страницы).
+- Результат: таблица 13 вариантов (размер, задача, пропуски, формат, проблемы данных). Методы с пар: OneHotEncoder(drop='first'), IterativeImputer + NRMSE, missingno, scipy.
+- Дальше: выбрать вариант.
