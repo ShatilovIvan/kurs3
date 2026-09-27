@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Node
+node_modules/
+dist/
+build/
+
+# Claude local
+.claude/settings.local.json
+
+# OS / editors
+desktop.ini
+Thumbs.db
+.DS_Store
+.vscode/
+.idea/
+
+# Office temp files
+~$*
