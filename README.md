@@ -32,6 +32,7 @@
 | `ambiguity-detection-in-requirements` | размытые формулировки в ТЗ | SE |
 | `mvp-scope-cutting` | урезать хотелки до MVP | SE |
 | `estimation-from-requirements` | оценка трудоёмкости | SE |
+| `check-lab` | скептик: атака на карту ЛР (`plan`) и проверка решения перед сдачей (`solution`) | все, обязательно перед `готова` |
 | `debug` | поиск причины ошибки в решении | все |
 | `plain` | переобъяснить простыми словами (`/plain`) | защита ЛР |
 

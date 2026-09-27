@@ -8,4 +8,5 @@
 | enterprise-architecture | github.com/gauravs19/enterprise-architecture-skill |
 | software-architecture, modern-web-app-architecture | github.com/keez97/claude-architecture-skills |
 | debug + agents/debugger.md | github.com/ayusavin/labs-harness (адаптировано под лабы) |
+| check-lab + agents/lab-skeptic.md | labs-harness `skeptic` + `reviewer`, textery `premortem-agent` — объединены и переписаны под лабы |
 | plain | textery |
