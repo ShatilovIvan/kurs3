@@ -61,6 +61,15 @@ CREATE TABLE races (
     CONSTRAINT races_PK PRIMARY KEY (race_ID)
 );
 
+CREATE TABLE results (
+    race_ID integer NOT NULL,
+    driver_ID integer NOT NULL,
+    car_ID integer NOT NULL,
+    position integer NOT NULL,
+    points numeric(4,1) NOT NULL,
+    CONSTRAINT results_PK PRIMARY KEY (race_ID, driver_ID)
+);
+
 ALTER TABLE cars
 ADD CONSTRAINT cars_FK FOREIGN KEY (team_ID)
 REFERENCES teams (team_ID)
@@ -97,19 +106,42 @@ REFERENCES sponsors (sponsor_ID)
 ON DELETE RESTRICT
 ON UPDATE CASCADE;
 
+ALTER TABLE results
+ADD CONSTRAINT results_FK1 FOREIGN KEY (race_ID)
+REFERENCES races (race_ID)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+ALTER TABLE results
+ADD CONSTRAINT results_FK2 FOREIGN KEY (driver_ID)
+REFERENCES drivers (driver_ID)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+ALTER TABLE results
+ADD CONSTRAINT results_FK3 FOREIGN KEY (car_ID)
+REFERENCES cars (car_ID)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
 ALTER TABLE teams ADD CONSTRAINT teams_name_UQ UNIQUE (name);
 ALTER TABLE sponsors ADD CONSTRAINT sponsors_name_UQ UNIQUE (name);
 ALTER TABLE tracks ADD CONSTRAINT tracks_name_UQ UNIQUE (name);
+ALTER TABLE results ADD CONSTRAINT results_position_UQ UNIQUE (race_ID, position);
 
 ALTER TABLE cars ADD CONSTRAINT cars_year_CHK CHECK (year BETWEEN 1950 AND 2100);
 ALTER TABLE sponsors ADD CONSTRAINT sponsors_budget_CHK CHECK (budget >= 0);
 ALTER TABLE tracks ADD CONSTRAINT tracks_length_CHK CHECK (length_km > 0);
+ALTER TABLE results ADD CONSTRAINT results_position_CHK CHECK (position >= 1);
+ALTER TABLE results ADD CONSTRAINT results_points_CHK CHECK (points >= 0);
 
 CREATE INDEX cars_team_IDX ON cars (team_ID);
 CREATE INDEX drivers_team_IDX ON drivers (team_ID);
 CREATE INDEX car_parts_part_IDX ON car_parts (part_ID);
 CREATE INDEX races_track_IDX ON races (track_ID);
 CREATE INDEX races_sponsor_IDX ON races (sponsor_ID);
+CREATE INDEX results_driver_IDX ON results (driver_ID);
+CREATE INDEX results_car_IDX ON results (car_ID);
 
 COMMENT ON TABLE teams IS 'Команды';
 COMMENT ON TABLE cars IS 'Болиды';
@@ -119,3 +151,4 @@ COMMENT ON TABLE car_parts IS 'Запчасти болидов';
 COMMENT ON TABLE sponsors IS 'Спонсоры';
 COMMENT ON TABLE tracks IS 'Трассы';
 COMMENT ON TABLE races IS 'Гонки';
+COMMENT ON TABLE results IS 'Результаты гонок';

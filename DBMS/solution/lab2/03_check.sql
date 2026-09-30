@@ -40,6 +40,7 @@ INSERT INTO car_parts VALUES (1, 1), (1, 2), (2, 2), (2, 3);
 INSERT INTO sponsors VALUES (1, 'Aramco', 50000000.00);
 INSERT INTO tracks VALUES (1, 'Монца', 'Италия', 5.793);
 INSERT INTO races VALUES (1, 'Гран-при Италии', '2024-09-01', 1, 1);
+INSERT INTO results VALUES (1, 1, 1, 1, 25), (1, 2, 2, 2, 18);
 
 DO $$
 BEGIN
@@ -98,6 +99,30 @@ BEGIN
         RAISE NOTICE 'OK  NOT NULL: пилот без имени отклонён';
     END;
     BEGIN
+        INSERT INTO results VALUES (1, 99, 1, 3, 15);
+        RAISE NOTICE 'FAIL: результат несуществующего пилота вставлен';
+    EXCEPTION WHEN foreign_key_violation THEN
+        RAISE NOTICE 'OK  results_FK2: результат несуществующего пилота отклонён';
+    END;
+    BEGIN
+        UPDATE results SET position = 1 WHERE race_ID = 1 AND driver_ID = 2;
+        RAISE NOTICE 'FAIL: второй пилот на 1-м месте записан';
+    EXCEPTION WHEN unique_violation THEN
+        RAISE NOTICE 'OK  results_position_UQ: второй пилот на том же месте гонки отклонён';
+    END;
+    BEGIN
+        INSERT INTO results VALUES (1, 1, 1, 5, 10);
+        RAISE NOTICE 'FAIL: второй результат пилота в гонке вставлен';
+    EXCEPTION WHEN unique_violation THEN
+        RAISE NOTICE 'OK  results_PK: второй результат пилота в одной гонке отклонён';
+    END;
+    BEGIN
+        UPDATE results SET points = -1 WHERE race_ID = 1 AND driver_ID = 1;
+        RAISE NOTICE 'FAIL: отрицательные очки записаны';
+    EXCEPTION WHEN check_violation THEN
+        RAISE NOTICE 'OK  results_points_CHK: отрицательные очки отклонены';
+    END;
+    BEGIN
         DELETE FROM tracks WHERE track_ID = 1;
         RAISE NOTICE 'FAIL: трасса с гонками удалена';
     EXCEPTION WHEN foreign_key_violation OR restrict_violation THEN
@@ -119,6 +144,7 @@ SELECT 'после DELETE команды 10' AS step,
        (SELECT count(*) FROM cars) AS cars,
        (SELECT count(*) FROM drivers) AS drivers,
        (SELECT count(*) FROM car_parts) AS car_parts,
+       (SELECT count(*) FROM results) AS results,
        (SELECT count(*) FROM parts) AS parts;
 
 ROLLBACK;
