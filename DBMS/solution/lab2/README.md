@@ -7,8 +7,8 @@
 
 | Файл | Что делает | Где выполнять |
 |---|---|---|
-| `01_create_database.sql` | `CREATE DATABASE formula1` по образцу стр. 69 + комментарий | pgAdmin → Query Tool на базе `postgres` |
-| `02_create_tables.sql` | 7 таблиц (`CREATE TABLE` c NOT NULL и PK), затем `ALTER TABLE`: 5 внешних ключей, 3 UNIQUE, 3 CHECK; 4 индекса на внешние ключи; комментарии | pgAdmin → Query Tool на базе `formula1` |
+| `01_create_database.sql` | `CREATE DATABASE formula1` по образцу стр. 69 — единственная команда в файле | pgAdmin → Query Tool на базе `postgres` |
+| `02_create_tables.sql` | 7 таблиц (`CREATE TABLE` c NOT NULL и PK), затем `ALTER TABLE`: 5 внешних ключей, 3 UNIQUE, 3 CHECK; 4 индекса на внешние ключи; комментарии к базе и таблицам | pgAdmin → Query Tool на базе `formula1` |
 | `03_check.sql` | Проверка: список таблиц, полей, ограничений, индексов; тест ограничений на данных внутри транзакции с `ROLLBACK` (база остаётся пустой) | Query Tool на базе `formula1` |
 | `check_output.txt` | Вывод `03_check.sql` на PostgreSQL 15 | — |
 | `build_report.py` | Сборка `report.docx` (вставляет скриншоты из `img/`, если они есть) | `python build_report.py` |
@@ -28,7 +28,7 @@
 
 ## Запуск в pgAdmin (Windows, как в пособии)
 
-1. Query Tool на базе `postgres` → открыть `01_create_database.sql` → Execute (F5).
+1. Query Tool на базе `postgres` → открыть `01_create_database.sql` → Execute (F5). В файле только `CREATE DATABASE`: pgAdmin выполняет несколько команд одной транзакцией, а `CREATE DATABASE` в транзакции запрещён (`ERROR: CREATE DATABASE cannot run inside a transaction block`, SQLSTATE 25001). Поэтому `COMMENT ON DATABASE` перенесён в `02_create_tables.sql`.
 2. В браузере pgAdmin: Refresh на Databases → появится `formula1`.
 3. Query Tool на базе `formula1` → `02_create_tables.sql` → F5.
 4. Refresh на `formula1 → Schemas → public → Tables` — 7 таблиц.

@@ -252,6 +252,13 @@ def main():
               "(файл 01_create_database.sql).")
     code(doc, (HERE / "01_create_database.sql").read_text(encoding="utf-8"))
     para(doc)
+    para(doc, "В файле 01_create_database.sql одна команда: pgAdmin выполняет несколько команд "
+              "одной транзакцией, а CREATE DATABASE внутри транзакции запрещён (ошибка SQLSTATE 25001). "
+              "Поэтому комментарий к базе задаётся в начале файла 02_create_tables.sql:")
+    sql2 = (HERE / "02_create_tables.sql").read_text(encoding="utf-8")
+    c0 = sql2.index("COMMENT ON DATABASE")
+    code(doc, sql2[c0:sql2.index(";", c0) + 1])
+    para(doc)
     para(doc, "Локаль Russian_Russia.1251 указана как в образце и существует в Windows. Скриншоты в отчёте "
               "получены на тестовом сервере PostgreSQL 15 под Linux, где этой локали нет, поэтому на "
               "рисунке 1 показана локаль сервера en_US.utf8.")
