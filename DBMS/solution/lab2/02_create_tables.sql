@@ -25,11 +25,16 @@ CREATE TABLE drivers (
 );
 
 CREATE TABLE parts (
-    car_ID integer NOT NULL,
     part_ID integer NOT NULL,
     name varchar(100) NOT NULL,
     type varchar(50) NOT NULL,
-    CONSTRAINT parts_PK PRIMARY KEY (car_ID, part_ID)
+    CONSTRAINT parts_PK PRIMARY KEY (part_ID)
+);
+
+CREATE TABLE car_parts (
+    car_ID integer NOT NULL,
+    part_ID integer NOT NULL,
+    CONSTRAINT car_parts_PK PRIMARY KEY (car_ID, part_ID)
 );
 
 CREATE TABLE sponsors (
@@ -68,10 +73,16 @@ REFERENCES teams (team_ID)
 ON DELETE CASCADE
 ON UPDATE CASCADE;
 
-ALTER TABLE parts
-ADD CONSTRAINT parts_FK FOREIGN KEY (car_ID)
+ALTER TABLE car_parts
+ADD CONSTRAINT car_parts_FK1 FOREIGN KEY (car_ID)
 REFERENCES cars (car_ID)
 ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+ALTER TABLE car_parts
+ADD CONSTRAINT car_parts_FK2 FOREIGN KEY (part_ID)
+REFERENCES parts (part_ID)
+ON DELETE RESTRICT
 ON UPDATE CASCADE;
 
 ALTER TABLE races
@@ -96,6 +107,7 @@ ALTER TABLE tracks ADD CONSTRAINT tracks_length_CHK CHECK (length_km > 0);
 
 CREATE INDEX cars_team_IDX ON cars (team_ID);
 CREATE INDEX drivers_team_IDX ON drivers (team_ID);
+CREATE INDEX car_parts_part_IDX ON car_parts (part_ID);
 CREATE INDEX races_track_IDX ON races (track_ID);
 CREATE INDEX races_sponsor_IDX ON races (sponsor_ID);
 
@@ -103,6 +115,7 @@ COMMENT ON TABLE teams IS 'Команды';
 COMMENT ON TABLE cars IS 'Болиды';
 COMMENT ON TABLE drivers IS 'Пилоты';
 COMMENT ON TABLE parts IS 'Запчасти';
+COMMENT ON TABLE car_parts IS 'Запчасти болидов';
 COMMENT ON TABLE sponsors IS 'Спонсоры';
 COMMENT ON TABLE tracks IS 'Трассы';
 COMMENT ON TABLE races IS 'Гонки';

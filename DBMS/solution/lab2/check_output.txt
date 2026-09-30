@@ -1,5 +1,6 @@
- table_name | comment  
-------------+----------
+ table_name |     comment      
+------------+------------------
+ car_parts  | Запчасти болидов
  cars       | Болиды
  drivers    | Пилоты
  parts      | Запчасти
@@ -7,10 +8,12 @@
  sponsors   | Спонсоры
  teams      | Команды
  tracks     | Трассы
-(7 rows)
+(8 rows)
 
  table_name | column_name |          type          | is_nullable 
 ------------+-------------+------------------------+-------------
+ car_parts  | car_id      | integer                | NO
+ car_parts  | part_id     | integer                | NO
  cars       | car_id      | integer                | NO
  cars       | model       | character varying(50)  | NO
  cars       | year        | integer                | NO
@@ -19,7 +22,6 @@
  drivers    | name        | character varying(100) | NO
  drivers    | country     | character varying(50)  | NO
  drivers    | team_id     | integer                | NO
- parts      | car_id      | integer                | NO
  parts      | part_id     | integer                | NO
  parts      | name        | character varying(100) | NO
  parts      | type        | character varying(50)  | NO
@@ -38,17 +40,19 @@
  tracks     | name        | character varying(100) | NO
  tracks     | country     | character varying(50)  | NO
  tracks     | length_km   | numeric(5,3)           | NO
-(27 rows)
+(28 rows)
 
  table_name |   constraint_name   | type |                                          definition                                           
 ------------+---------------------+------+-----------------------------------------------------------------------------------------------
+ car_parts  | car_parts_fk1       | f    | FOREIGN KEY (car_id) REFERENCES cars(car_id) ON UPDATE CASCADE ON DELETE CASCADE
+ car_parts  | car_parts_fk2       | f    | FOREIGN KEY (part_id) REFERENCES parts(part_id) ON UPDATE CASCADE ON DELETE RESTRICT
+ car_parts  | car_parts_pk        | p    | PRIMARY KEY (car_id, part_id)
  cars       | cars_year_chk       | c    | CHECK (((year >= 1950) AND (year <= 2100)))
  cars       | cars_fk             | f    | FOREIGN KEY (team_id) REFERENCES teams(team_id) ON UPDATE CASCADE ON DELETE CASCADE
  cars       | cars_pk             | p    | PRIMARY KEY (car_id)
  drivers    | drivers_fk          | f    | FOREIGN KEY (team_id) REFERENCES teams(team_id) ON UPDATE CASCADE ON DELETE CASCADE
  drivers    | drivers_pk          | p    | PRIMARY KEY (driver_id)
- parts      | parts_fk            | f    | FOREIGN KEY (car_id) REFERENCES cars(car_id) ON UPDATE CASCADE ON DELETE CASCADE
- parts      | parts_pk            | p    | PRIMARY KEY (car_id, part_id)
+ parts      | parts_pk            | p    | PRIMARY KEY (part_id)
  races      | races_fk1           | f    | FOREIGN KEY (track_id) REFERENCES tracks(track_id) ON UPDATE CASCADE ON DELETE RESTRICT
  races      | races_fk2           | f    | FOREIGN KEY (sponsor_id) REFERENCES sponsors(sponsor_id) ON UPDATE CASCADE ON DELETE RESTRICT
  races      | races_pk            | p    | PRIMARY KEY (race_id)
@@ -60,36 +64,41 @@
  tracks     | tracks_length_chk   | c    | CHECK ((length_km > (0)::numeric))
  tracks     | tracks_pk           | p    | PRIMARY KEY (track_id)
  tracks     | tracks_name_uq      | u    | UNIQUE (name)
-(18 rows)
+(20 rows)
 
- tablename |     indexname     |                                  indexdef                                   
------------+-------------------+-----------------------------------------------------------------------------
- cars      | cars_pk           | CREATE UNIQUE INDEX cars_pk ON public.cars USING btree (car_id)
- cars      | cars_team_idx     | CREATE INDEX cars_team_idx ON public.cars USING btree (team_id)
- drivers   | drivers_pk        | CREATE UNIQUE INDEX drivers_pk ON public.drivers USING btree (driver_id)
- drivers   | drivers_team_idx  | CREATE INDEX drivers_team_idx ON public.drivers USING btree (team_id)
- parts     | parts_pk          | CREATE UNIQUE INDEX parts_pk ON public.parts USING btree (car_id, part_id)
- races     | races_pk          | CREATE UNIQUE INDEX races_pk ON public.races USING btree (race_id)
- races     | races_sponsor_idx | CREATE INDEX races_sponsor_idx ON public.races USING btree (sponsor_id)
- races     | races_track_idx   | CREATE INDEX races_track_idx ON public.races USING btree (track_id)
- sponsors  | sponsors_name_uq  | CREATE UNIQUE INDEX sponsors_name_uq ON public.sponsors USING btree (name)
- sponsors  | sponsors_pk       | CREATE UNIQUE INDEX sponsors_pk ON public.sponsors USING btree (sponsor_id)
- teams     | teams_name_uq     | CREATE UNIQUE INDEX teams_name_uq ON public.teams USING btree (name)
- teams     | teams_pk          | CREATE UNIQUE INDEX teams_pk ON public.teams USING btree (team_id)
- tracks    | tracks_name_uq    | CREATE UNIQUE INDEX tracks_name_uq ON public.tracks USING btree (name)
- tracks    | tracks_pk         | CREATE UNIQUE INDEX tracks_pk ON public.tracks USING btree (track_id)
-(14 rows)
+ tablename |     indexname      |                                      indexdef                                      
+-----------+--------------------+------------------------------------------------------------------------------------
+ car_parts | car_parts_part_idx | CREATE INDEX car_parts_part_idx ON public.car_parts USING btree (part_id)
+ car_parts | car_parts_pk       | CREATE UNIQUE INDEX car_parts_pk ON public.car_parts USING btree (car_id, part_id)
+ cars      | cars_pk            | CREATE UNIQUE INDEX cars_pk ON public.cars USING btree (car_id)
+ cars      | cars_team_idx      | CREATE INDEX cars_team_idx ON public.cars USING btree (team_id)
+ drivers   | drivers_pk         | CREATE UNIQUE INDEX drivers_pk ON public.drivers USING btree (driver_id)
+ drivers   | drivers_team_idx   | CREATE INDEX drivers_team_idx ON public.drivers USING btree (team_id)
+ parts     | parts_pk           | CREATE UNIQUE INDEX parts_pk ON public.parts USING btree (part_id)
+ races     | races_pk           | CREATE UNIQUE INDEX races_pk ON public.races USING btree (race_id)
+ races     | races_sponsor_idx  | CREATE INDEX races_sponsor_idx ON public.races USING btree (sponsor_id)
+ races     | races_track_idx    | CREATE INDEX races_track_idx ON public.races USING btree (track_id)
+ sponsors  | sponsors_name_uq   | CREATE UNIQUE INDEX sponsors_name_uq ON public.sponsors USING btree (name)
+ sponsors  | sponsors_pk        | CREATE UNIQUE INDEX sponsors_pk ON public.sponsors USING btree (sponsor_id)
+ teams     | teams_name_uq      | CREATE UNIQUE INDEX teams_name_uq ON public.teams USING btree (name)
+ teams     | teams_pk           | CREATE UNIQUE INDEX teams_pk ON public.teams USING btree (team_id)
+ tracks    | tracks_name_uq     | CREATE UNIQUE INDEX tracks_name_uq ON public.tracks USING btree (name)
+ tracks    | tracks_pk          | CREATE UNIQUE INDEX tracks_pk ON public.tracks USING btree (track_id)
+(16 rows)
 
 BEGIN
 INSERT 0 2
 INSERT 0 2
 INSERT 0 2
 INSERT 0 3
+INSERT 0 4
 INSERT 0 1
 INSERT 0 1
 INSERT 0 1
 NOTICE:  OK  cars_FK: болид с несуществующей командой отклонён
-NOTICE:  OK  parts_PK: повтор пары (car_ID, part_ID) отклонён
+NOTICE:  OK  car_parts_PK: повтор пары (car_ID, part_ID) отклонён
+NOTICE:  OK  car_parts_FK2: несуществующая запчасть не привязана к болиду
+NOTICE:  OK  car_parts_FK2 RESTRICT: запчасть, установленная в болиды, не удалена
 NOTICE:  OK  teams_name_UQ: повтор названия команды отклонён
 NOTICE:  OK  cars_year_CHK: год 1900 отклонён
 NOTICE:  OK  tracks_length_CHK: длина 0 км отклонена
@@ -106,9 +115,9 @@ UPDATE 1
 (2 rows)
 
 DELETE 1
-          step           | cars | drivers | parts 
--------------------------+------+---------+-------
- после DELETE команды 10 |    1 |       1 |     1
+          step           | cars | drivers | car_parts | parts 
+-------------------------+------+---------+-----------+-------
+ после DELETE команды 10 |    1 |       1 |         2 |     3
 (1 row)
 
 ROLLBACK

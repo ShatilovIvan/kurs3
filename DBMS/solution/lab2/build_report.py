@@ -35,10 +35,13 @@ TABLES = [
         ("team_ID", "integer", "FK → teams, NOT NULL", "Команда"),
     ]),
     ("parts", "Запчасти", [
-        ("car_ID", "integer", "PK, FK → cars, NOT NULL", "Болид"),
-        ("part_ID", "integer", "PK, NOT NULL", "Номер запчасти в болиде"),
+        ("part_ID", "integer", "PK, NOT NULL", "Идентификатор запчасти"),
         ("name", "varchar(100)", "NOT NULL", "Название"),
         ("type", "varchar(50)", "NOT NULL", "Тип запчасти"),
+    ]),
+    ("car_parts", "Запчасти болидов", [
+        ("car_ID", "integer", "PK, FK → cars, NOT NULL", "Болид"),
+        ("part_ID", "integer", "PK, FK → parts, NOT NULL", "Запчасть, установленная в болид"),
     ]),
     ("sponsors", "Спонсоры", [
         ("sponsor_ID", "integer", "PK, NOT NULL", "Идентификатор спонсора"),
@@ -63,25 +66,29 @@ TABLES = [
 FOREIGN_KEYS = [
     ("cars_FK", "cars.team_ID → teams.team_ID", "1:N", "CASCADE", "CASCADE"),
     ("drivers_FK", "drivers.team_ID → teams.team_ID", "1:N", "CASCADE", "CASCADE"),
-    ("parts_FK", "parts.car_ID → cars.car_ID", "1:N, идентифицирующая", "CASCADE", "CASCADE"),
+    ("car_parts_FK1", "car_parts.car_ID → cars.car_ID", "1:N, идентифицирующая", "CASCADE", "CASCADE"),
+    ("car_parts_FK2", "car_parts.part_ID → parts.part_ID", "1:N, идентифицирующая", "RESTRICT", "CASCADE"),
     ("races_FK1", "races.track_ID → tracks.track_ID", "1:N", "RESTRICT", "CASCADE"),
     ("races_FK2", "races.sponsor_ID → sponsors.sponsor_ID", "1:N", "RESTRICT", "CASCADE"),
 ]
 
 INDEXES = [
-    ("teams_PK, cars_PK, drivers_PK, sponsors_PK, tracks_PK, races_PK", "первичный ключ таблицы",
+    ("teams_PK, cars_PK, drivers_PK, parts_PK, sponsors_PK, tracks_PK, races_PK", "первичный ключ таблицы",
      "автоматически (PRIMARY KEY)"),
-    ("parts_PK", "(car_ID, part_ID)", "автоматически (PRIMARY KEY); покрывает и внешний ключ parts.car_ID"),
+    ("car_parts_PK", "(car_ID, part_ID)", "автоматически (PRIMARY KEY); покрывает и внешний ключ car_parts.car_ID"),
     ("teams_name_UQ, sponsors_name_UQ, tracks_name_UQ", "name", "автоматически (UNIQUE)"),
     ("cars_team_IDX", "cars.team_ID", "CREATE INDEX"),
     ("drivers_team_IDX", "drivers.team_ID", "CREATE INDEX"),
+    ("car_parts_part_IDX", "car_parts.part_ID", "CREATE INDEX"),
     ("races_track_IDX", "races.track_ID", "CREATE INDEX"),
     ("races_sponsor_IDX", "races.sponsor_ID", "CREATE INDEX"),
 ]
 
 CHECKS = [
     ("Вставка болида с несуществующей командой", "foreign_key_violation (cars_FK)"),
-    ("Повтор пары (car_ID, part_ID) в parts", "unique_violation (parts_PK)"),
+    ("Повтор пары (car_ID, part_ID) в car_parts", "unique_violation (car_parts_PK)"),
+    ("Привязка к болиду несуществующей запчасти", "foreign_key_violation (car_parts_FK2)"),
+    ("Удаление запчасти, установленной в болиды", "foreign_key_violation или restrict_violation (car_parts_FK2, RESTRICT)"),
     ("Повтор названия команды", "unique_violation (teams_name_UQ)"),
     ("Болид 1900 года", "check_violation (cars_year_CHK)"),
     ("Трасса длиной 0 км", "check_violation (tracks_length_CHK)"),
@@ -90,14 +97,14 @@ CHECKS = [
     ("Удаление трассы, на которой есть гонки", "foreign_key_violation или restrict_violation (races_FK1, RESTRICT)"),
     ("Удаление спонсора, у которого есть гонки", "foreign_key_violation или restrict_violation (races_FK2, RESTRICT)"),
     ("UPDATE teams: team_ID 1 → 10", "в cars и drivers team_ID стал 10 (ON UPDATE CASCADE)"),
-    ("DELETE команды 10", "удалены её болид, пилот и запчасти болида (ON DELETE CASCADE)"),
+    ("DELETE команды 10", "удалены её болид, пилот и привязки запчастей к болиду; справочник parts не изменился (ON DELETE CASCADE)"),
 ]
 
 FIGURES = [
     ("01_database.png", "База данных formula1 в браузере pgAdmin и её SQL-определение"),
     ("02_tables.png", "Таблицы базы данных formula1"),
     ("03_constraints.png", "Таблица cars: первичный и внешний ключ, ограничение CHECK, индекс"),
-    ("07_parts_pk.png", "Таблица parts: составной первичный ключ и идентифицирующая связь с cars"),
+    ("07_parts_pk.png", "Таблица car_parts: составной первичный ключ и связи с cars и parts"),
     ("04_indexes.png", "Таблица races: два внешних ключа с RESTRICT и индексы на них"),
     ("05_check_messages.png", "Результат выполнения 03_check.sql (вкладка Messages)"),
     ("06_erd.png", "ER-диаграмма базы данных formula1 (ERD Tool → ERD for Database)"),
@@ -240,10 +247,12 @@ def main():
         "составить отчёт.",
     ):
         para(doc, "• " + item)
-    para(doc, "Предметная область — чемпионат «Формула-1». Модель данных (ЛР 1) содержит семь сущностей: "
+    para(doc, "Предметная область — чемпионат «Формула-1». Модель данных (ЛР 1) содержит сущности "
               "Команды, Болиды, Пилоты, Запчасти, Спонсоры, Трассы и Гонки. Команда имеет много болидов "
-              "и пилотов, болид — много запчастей (запчасть — зависимая сущность, идентифицирующая связь), "
-              "на трассе и при участии спонсора проводится много гонок.")
+              "и пилотов, на трассе и при участии спонсора проводится много гонок. Болид и запчасть связаны "
+              "отношением «многие-ко-многим»: в болиде много запчастей, а одна запчасть из справочника может "
+              "стоять в нескольких болидах. Такая связь реализуется отдельной таблицей car_parts "
+              "(Запчасти болидов), которая хранит пары «болид — запчасть».")
 
     heading(doc, "1. Создание базы данных")
     para(doc, "База данных formula1 создаётся инструкцией CREATE DATABASE по образцу пособия (с. 69): "
@@ -265,10 +274,10 @@ def main():
     figure(doc, 1, *FIGURES[0])
 
     heading(doc, "2. Создание таблиц")
-    para(doc, "По физической модели из ЛР 1 созданы семь таблиц. Как рекомендует пособие (с. 76), "
+    para(doc, "По физической модели из ЛР 1 созданы восемь таблиц: семь сущностей и связующая таблица car_parts. Как рекомендует пособие (с. 76), "
               "в инструкциях CREATE TABLE заданы только ограничения NOT NULL и PRIMARY KEY, остальные "
               "ограничения добавляются отдельными инструкциями ALTER TABLE (файл 02_create_tables.sql). "
-              "Структура таблиц приведена в таблицах 1–7.")
+              "Структура таблиц приведена в таблицах 1–8.")
     for i, (name, ru, cols) in enumerate(TABLES, 1):
         para(doc, f"Таблица {i} — {name} ({ru})", indent=False, size=12)
         table(doc, ("Поле", "Тип", "Ограничения", "Описание"), cols, widths=(3, 3.2, 5, 5.3))
@@ -280,12 +289,14 @@ def main():
     figure(doc, 2, *FIGURES[1])
 
     heading(doc, "3. Связи и ограничения целостности")
-    para(doc, "Связи «один-ко-многим» из модели ЛР 1 реализованы внешними ключами (таблица 8). "
+    para(doc, "Связи «один-ко-многим» из модели ЛР 1 реализованы внешними ключами (таблица 9); связь «многие-ко-многим» болидов и запчастей "
+              "разложена на две связи «один-ко-многим» через таблицу car_parts. "
               "Для данных, принадлежащих команде и болиду, выбрано каскадное удаление и обновление, как "
               "в образце пособия (с. 79): при удалении команды удаляются её болиды и пилоты, при удалении "
-              "болида — его запчасти. Трассу и спонсора, у которых есть гонки, удалить нельзя (RESTRICT), "
+              "болида — привязки запчастей к нему (сама запчасть остаётся в справочнике parts). "
+              "Запчасть, установленную хотя бы в один болид, удалить нельзя (RESTRICT). Трассу и спонсора, у которых есть гонки, удалить нельзя (RESTRICT), "
               "чтобы не потерять результаты гонок; изменение их ключа распространяется каскадно.")
-    para(doc, "Таблица 8 — Внешние ключи", indent=False, size=12)
+    para(doc, "Таблица 9 — Внешние ключи", indent=False, size=12)
     table(doc, ("Ограничение", "Связь", "Тип", "ON DELETE", "ON UPDATE"), FOREIGN_KEYS,
           widths=(2.8, 6, 3.2, 2.3, 2.2))
     para(doc, "Дополнительно заданы ограничения уникальности потенциальных ключей — названий команд, "
@@ -304,9 +315,10 @@ def main():
               "ограничения UNIQUE (пособие, с. 72), но не создаёт индекс для внешнего ключа (с. 73). "
               "Поэтому на столбцы внешних ключей созданы индексы B-дерева; они ускоряют соединение "
               "таблиц и проверку ссылочной целостности при удалении и изменении родительской строки. "
-              "Для parts.car_ID отдельный индекс не нужен: этот столбец — первый в составном "
-              "первичном ключе (car_ID, part_ID). Всего в базе 14 индексов (таблица 9).")
-    para(doc, "Таблица 9 — Индексы", indent=False, size=12)
+              "Для car_parts.car_ID отдельный индекс не нужен: этот столбец — первый в составном "
+              "первичном ключе (car_ID, part_ID); для car_parts.part_ID индекс создан. "
+              "Всего в базе 16 индексов (таблица 10).")
+    para(doc, "Таблица 10 — Индексы", indent=False, size=12)
     table(doc, ("Индекс", "Столбцы", "Как создан"), INDEXES, widths=(6.5, 4.5, 5.5))
     code(doc, sql[end:sql.index("COMMENT ON TABLE")])
     para(doc)
@@ -316,20 +328,20 @@ def main():
     para(doc, "Скрипт 03_check.sql выводит из системного каталога список таблиц, полей, ограничений "
               "и индексов, а затем внутри транзакции вставляет тестовые данные и пытается нарушить "
               "каждое ограничение. В конце выполняется ROLLBACK, поэтому база остаётся пустой. "
-              "Результаты приведены в таблице 10 и на рисунке 6, полный вывод — в файле check_output.txt.")
-    para(doc, "Таблица 10 — Проверка ограничений", indent=False, size=12)
+              "Результаты приведены в таблице 11 и на рисунке 6, полный вывод — в файле check_output.txt.")
+    para(doc, "Таблица 11 — Проверка ограничений", indent=False, size=12)
     table(doc, ("Действие", "Результат"), CHECKS, widths=(8, 8.5))
     figure(doc, 6, *FIGURES[5])
 
     heading(doc, "6. ER-диаграмма")
     para(doc, "ER-диаграмма построена в pgAdmin командой Tools > ERD Tool, пункт ERD for Database "
-              "(пособие, с. 80). Она совпадает с моделью ЛР 1: семь таблиц и пять связей "
-              "«один-ко-многим».")
+              "(пособие, с. 80). На ней восемь таблиц и шесть связей "
+              "«один-ко-многим», две из которых образуют связь «многие-ко-многим» болидов и запчастей.")
     figure(doc, 7, *FIGURES[6])
 
     heading(doc, "Вывод")
-    para(doc, "В ходе работы в PostgreSQL 15 создана база данных formula1 из семи таблиц. Определены типы "
-              "полей, первичные ключи (в том числе составной ключ зависимой таблицы parts), пять внешних "
+    para(doc, "В ходе работы в PostgreSQL 15 создана база данных formula1 из восьми таблиц. Определены типы "
+              "полей, первичные ключи (в том числе составной ключ связующей таблицы car_parts), шесть внешних "
               "ключей с действиями ON DELETE и ON UPDATE, ограничения NOT NULL, UNIQUE и CHECK, а также "
               "индексы на столбцы внешних ключей. Проверка на тестовых данных показала, что все "
               "ограничения отклоняют некорректные данные, а каскадные действия работают согласно "

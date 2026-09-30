@@ -34,8 +34,9 @@ BEGIN;
 INSERT INTO teams VALUES (1, 'Ferrari', 'Маранелло'), (2, 'McLaren', 'Уокинг');
 INSERT INTO cars VALUES (1, 'SF-24', 2024, 1), (2, 'MCL38', 2024, 2);
 INSERT INTO drivers VALUES (1, 'Шарль Леклер', 'Монако', 1), (2, 'Ландо Норрис', 'Великобритания', 2);
-INSERT INTO parts VALUES (1, 1, 'Силовая установка 066/12', 'двигатель'), (1, 2, 'Переднее антикрыло', 'аэродинамика'),
-                         (2, 1, 'Коробка передач', 'трансмиссия');
+INSERT INTO parts VALUES (1, 'Силовая установка 066/12', 'двигатель'), (2, 'Переднее антикрыло', 'аэродинамика'),
+                         (3, 'Коробка передач', 'трансмиссия');
+INSERT INTO car_parts VALUES (1, 1), (1, 2), (2, 2), (2, 3);
 INSERT INTO sponsors VALUES (1, 'Aramco', 50000000.00);
 INSERT INTO tracks VALUES (1, 'Монца', 'Италия', 5.793);
 INSERT INTO races VALUES (1, 'Гран-при Италии', '2024-09-01', 1, 1);
@@ -49,10 +50,22 @@ BEGIN
         RAISE NOTICE 'OK  cars_FK: болид с несуществующей командой отклонён';
     END;
     BEGIN
-        INSERT INTO parts VALUES (1, 1, 'Дубль', 'двигатель');
+        INSERT INTO car_parts VALUES (1, 1);
         RAISE NOTICE 'FAIL: дубль (car_ID, part_ID) вставлен';
     EXCEPTION WHEN unique_violation THEN
-        RAISE NOTICE 'OK  parts_PK: повтор пары (car_ID, part_ID) отклонён';
+        RAISE NOTICE 'OK  car_parts_PK: повтор пары (car_ID, part_ID) отклонён';
+    END;
+    BEGIN
+        INSERT INTO car_parts VALUES (1, 99);
+        RAISE NOTICE 'FAIL: несуществующая запчасть привязана к болиду';
+    EXCEPTION WHEN foreign_key_violation THEN
+        RAISE NOTICE 'OK  car_parts_FK2: несуществующая запчасть не привязана к болиду';
+    END;
+    BEGIN
+        DELETE FROM parts WHERE part_ID = 2;
+        RAISE NOTICE 'FAIL: установленная запчасть удалена';
+    EXCEPTION WHEN foreign_key_violation OR restrict_violation THEN
+        RAISE NOTICE 'OK  car_parts_FK2 RESTRICT: запчасть, установленная в болиды, не удалена';
     END;
     BEGIN
         INSERT INTO teams VALUES (3, 'Ferrari', 'Рим');
@@ -105,6 +118,7 @@ DELETE FROM teams WHERE team_ID = 10;
 SELECT 'после DELETE команды 10' AS step,
        (SELECT count(*) FROM cars) AS cars,
        (SELECT count(*) FROM drivers) AS drivers,
+       (SELECT count(*) FROM car_parts) AS car_parts,
        (SELECT count(*) FROM parts) AS parts;
 
 ROLLBACK;
