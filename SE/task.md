@@ -51,7 +51,7 @@ Visual Paradigm (для BPMN-моделирования)
 
 ---
 
-## ЛР 3: Диаграммы прецедентов в Visual Paradigm
+## ЛР 1: Диаграммы прецедентов в Visual Paradigm
 
 ### Вариант
 10 — Таксопарк (из файла `Лабораторная работа 1-2 (2).pdf`, стр. 9)
@@ -75,8 +75,8 @@ Visual Paradigm for UML Community Edition
 - Extend: «Отменить заказ», «Оценить поездку»
 
 ### Файлы решения
-- `solution/lab3/README.md` — пошаговая инструкция
-- `solution/lab3/img/` — скриншоты (студент строит в Visual Paradigm)
+- `solution/lab1/README.md` — пошаговая инструкция
+- `solution/lab1/img/` — скриншоты (студент строит в Visual Paradigm)
 - Отчёт в Word (студент оформляет)
 
 ### Источники
