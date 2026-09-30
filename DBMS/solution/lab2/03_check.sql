@@ -87,13 +87,13 @@ BEGIN
     BEGIN
         DELETE FROM tracks WHERE track_ID = 1;
         RAISE NOTICE 'FAIL: трасса с гонками удалена';
-    EXCEPTION WHEN foreign_key_violation THEN
+    EXCEPTION WHEN foreign_key_violation OR restrict_violation THEN
         RAISE NOTICE 'OK  races_FK1 RESTRICT: трасса, на которой есть гонки, не удалена';
     END;
     BEGIN
         DELETE FROM sponsors WHERE sponsor_ID = 1;
         RAISE NOTICE 'FAIL: спонсор гонки удалён';
-    EXCEPTION WHEN foreign_key_violation THEN
+    EXCEPTION WHEN foreign_key_violation OR restrict_violation THEN
         RAISE NOTICE 'OK  races_FK2 RESTRICT: спонсор, у которого есть гонки, не удалён';
     END;
 END $$;

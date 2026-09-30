@@ -29,3 +29,9 @@
 - Результат: скрипты, переданные одной строкой запроса (как в pgAdmin), выполнились без ошибок: 7 CREATE TABLE, 11 ALTER TABLE, 4 CREATE INDEX, 8 COMMENT; `03_check.sql` — 9 строк OK и ROLLBACK; вывод совпадает с `check_output.txt` (кроме порядка строки `DO` относительно NOTICE).
 - Решения: пояснения, которые были в комментариях (зачем составной ключ у `parts`, почему нет индекса на `parts.car_ID`, почему `CREATE DATABASE` в отдельном файле), остаются в `README.md` и отчёте.
 - Дальше: студент делает принудительный pull (`git fetch origin` и `git reset --hard origin/dev`), запускает скрипты в своём pgAdmin, сверяет типы, вписывает ФИО, пересобирает отчёт; затем `/check-lab DBMS 2 solution`.
+
+## 2026-09-30 06:33 — ЛР 2: 03_check.sql падал на новых версиях PostgreSQL
+- Сделано: в `solution/lab2/03_check.sql` обработчики проверок RESTRICT (`races_FK1`, `races_FK2`) теперь ловят `foreign_key_violation OR restrict_violation`; в `solution/lab2/build_report.py` таблица проверок дополнена кодом `restrict_violation`, `report.docx` пересобран.
+- Результат: у студента в pgAdmin первые 7 проверок прошли, затем «ERROR: update or delete on table "tracks" violates RESTRICT setting of foreign key constraint "races_fk1" on table "races"», SQL state 23001. Воспроизведено на PostgreSQL 19beta3 (Docker): старый скрипт падает с той же ошибкой, новый — 9 строк OK и ROLLBACK. На PostgreSQL 15.19, 17.11 и 18.6 новый скрипт также даёт 9 OK; вывод на 15 совпадает с `check_output.txt`.
+- Решения: ограничение работает верно — трасса с гонками не удаляется; различается только код ошибки: PostgreSQL до 18 включительно сообщает о нарушении ON DELETE RESTRICT кодом 23503 (foreign_key_violation), 19 — кодом 23001 (restrict_violation). Проверка принимает оба кода.
+- Дальше: студент делает принудительный pull, повторно выполняет `03_check.sql`, снимает скриншоты, сверяет типы, вписывает ФИО; затем `/check-lab DBMS 2 solution`.

@@ -87,8 +87,8 @@ CHECKS = [
     ("Трасса длиной 0 км", "check_violation (tracks_length_CHK)"),
     ("Спонсор с отрицательным бюджетом", "check_violation (sponsors_budget_CHK)"),
     ("Пилот без имени", "not_null_violation"),
-    ("Удаление трассы, на которой есть гонки", "foreign_key_violation (races_FK1, RESTRICT)"),
-    ("Удаление спонсора, у которого есть гонки", "foreign_key_violation (races_FK2, RESTRICT)"),
+    ("Удаление трассы, на которой есть гонки", "foreign_key_violation или restrict_violation (races_FK1, RESTRICT)"),
+    ("Удаление спонсора, у которого есть гонки", "foreign_key_violation или restrict_violation (races_FK2, RESTRICT)"),
     ("UPDATE teams: team_ID 1 → 10", "в cars и drivers team_ID стал 10 (ON UPDATE CASCADE)"),
     ("DELETE команды 10", "удалены её болид, пилот и запчасти болида (ON DELETE CASCADE)"),
 ]
