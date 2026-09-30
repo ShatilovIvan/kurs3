@@ -5,28 +5,26 @@ M = len(ALPHABET)
 OUT_DIR = Path(__file__).parent
 
 
-def encrypt(text, k):
+def caesar(text, k, mode):
+    shift = k if mode == 0 else -k
     result = ""
     for ch in text.lower().replace("ё", "е"):
         if ch in ALPHABET:
-            result += ALPHABET[(ALPHABET.index(ch) + k) % M]
+            result += ALPHABET[(ALPHABET.index(ch) + shift) % M]
         else:
             result += ch
     return result
 
 
-def decrypt(text, k):
-    result = ""
-    for ch in text.lower().replace("ё", "е"):
-        if ch in ALPHABET:
-            result += ALPHABET[(ALPHABET.index(ch) - k) % M]
-        else:
-            result += ch
-    return result
-
-
-if __name__ == "__main__":
+def main():
     print("Часть 1. Шифрование и расшифрование")
+    while True:
+        raw = input("Выберите режим (0 - шифрование, 1 - расшифрование): ").strip()
+        if raw in ("0", "1"):
+            mode = int(raw)
+            break
+        print("Ошибка: режим должен быть 0 или 1.")
+
     while True:
         raw = input(f"Введите ключ k (целое число от 1 до {M}): ").strip()
         try:
@@ -43,14 +41,16 @@ if __name__ == "__main__":
         print(f"Ошибка: ключ должен быть от 1 до {M}.")
 
     text = input("Введите текст: ")
-    cipher = encrypt(text, k)
-    plain = decrypt(cipher, k)
+    result = caesar(text, k, mode)
     print("Ключ:", k)
-    print("Зашифрованный текст: ", cipher)
-    print("Расшифрованный текст:", plain)
-    (OUT_DIR / "encrypted.txt").write_text(f"Ключ: {k}\nШифр-текст: {cipher}\n", encoding="utf-8")
-    (OUT_DIR / "decrypted.txt").write_text(f"Ключ: {k}\nРасшифрованный текст: {plain}\n", encoding="utf-8")
-    print("Сохранено в encrypted.txt и decrypted.txt")
+    if mode == 0:
+        print("Зашифрованный текст:", result)
+        (OUT_DIR / "encrypted.txt").write_text(f"Ключ: {k}\nШифр-текст: {result}\n", encoding="utf-8")
+        print("Сохранено в encrypted.txt")
+    else:
+        print("Расшифрованный текст:", result)
+        (OUT_DIR / "decrypted.txt").write_text(f"Ключ: {k}\nРасшифрованный текст: {result}\n", encoding="utf-8")
+        print("Сохранено в decrypted.txt")
 
     print()
     print("Часть 2. Взлом шифровки варианта перебором ключа")
@@ -63,19 +63,19 @@ if __name__ == "__main__":
     lines = [f"ШИФР-ТЕКСТ (ШТ): {cipher}", "Варианты расшифрования при различных значениях ключа:"]
     best_k, best_score = 1, -1.0
     for key in range(1, M):
-        variant = decrypt(cipher, key)
+        variant = caesar(cipher, key, 1)
         lines.append(f"k = {key}: {variant}")
         print(f"k = {key:2}: {variant}")
         score = sum(freq.get(ch, 0) for ch in variant)
         if score > best_score:
             best_k, best_score = key, score
 
-    answer = decrypt(cipher, best_k)
+    answer = caesar(cipher, best_k, 1)
     print()
     print(f"Осмысленная фраза при k = {best_k}: {answer}")
     author_title = input("Введите фамилию автора и название произведения (без инициалов и кавычек): ")
     author_title = "".join(ch for ch in author_title.lower().replace("ё", "е") if ch in ALPHABET)
-    author_title_cipher = encrypt(author_title, best_k)
+    author_title_cipher = caesar(author_title, best_k, 0)
     print("Зашифрованные фамилия и название:", author_title_cipher)
 
     lines[1:1] = [
@@ -86,3 +86,7 @@ if __name__ == "__main__":
     ]
     (OUT_DIR / "bruteforce.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print("Сохранено в bruteforce.txt")
+
+
+if __name__ == "__main__":
+    main()
