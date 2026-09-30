@@ -1,9 +1,3 @@
--- ЛР 2. Проверка структуры базы данных formula1
--- Выполнять, подключившись к базе formula1, после 02_create_tables.sql.
--- Данные в конце вставляются внутри транзакции и откатываются (ROLLBACK):
--- база остаётся пустой, заполнение — предмет ЛР 3.
-
--- 1. Таблицы и комментарии
 SELECT c.relname AS table_name,
        obj_description(c.oid, 'pg_class') AS comment
 FROM pg_class c
@@ -11,7 +5,6 @@ JOIN pg_namespace n ON n.oid = c.relnamespace
 WHERE n.nspname = 'public' AND c.relkind = 'r'
 ORDER BY c.relname;
 
--- 2. Поля, типы и NOT NULL
 SELECT table_name, column_name,
        CASE WHEN character_maximum_length IS NOT NULL
             THEN data_type || '(' || character_maximum_length || ')'
@@ -23,8 +16,6 @@ FROM information_schema.columns
 WHERE table_schema = 'public'
 ORDER BY table_name, ordinal_position;
 
--- 3. Ограничения целостности (p — PK, f — FK, u — UNIQUE, c — CHECK)
---    Для FK: действия ON UPDATE / ON DELETE (c — CASCADE, r — RESTRICT)
 SELECT conrelid::regclass AS table_name,
        conname AS constraint_name,
        contype AS type,
@@ -33,13 +24,11 @@ FROM pg_constraint
 WHERE connamespace = 'public'::regnamespace
 ORDER BY conrelid::regclass::text, contype, conname;
 
--- 4. Индексы (автоматические для PK/UNIQUE и созданные вручную)
 SELECT tablename, indexname, indexdef
 FROM pg_indexes
 WHERE schemaname = 'public'
 ORDER BY tablename, indexname;
 
--- 5. Проверка ограничений на тестовых данных
 BEGIN;
 
 INSERT INTO teams VALUES (1, 'Ferrari', 'Маранелло'), (2, 'McLaren', 'Уокинг');
@@ -109,11 +98,9 @@ BEGIN
     END;
 END $$;
 
--- ON UPDATE CASCADE: новый team_ID команды переходит в болиды и пилотов
 UPDATE teams SET team_ID = 10 WHERE team_ID = 1;
 SELECT 'после UPDATE teams 1 -> 10' AS step, car_ID, team_ID FROM cars ORDER BY car_ID;
 
--- ON DELETE CASCADE: удаление команды удаляет её болиды, пилотов и запчасти болидов
 DELETE FROM teams WHERE team_ID = 10;
 SELECT 'после DELETE команды 10' AS step,
        (SELECT count(*) FROM cars) AS cars,

@@ -273,8 +273,8 @@ def main():
         para(doc, f"Таблица {i} — {name} ({ru})", indent=False, size=12)
         table(doc, ("Поле", "Тип", "Ограничения", "Описание"), cols, widths=(3, 3.2, 5, 5.3))
     sql = (HERE / "02_create_tables.sql").read_text(encoding="utf-8")
-    fk = sql.index("-------------------------------------------\n-- Определение внешних ключей")
-    first = sql.index("-------------------------------------------\n-- Создание таблицы teams")
+    fk = sql.index("ALTER TABLE cars\nADD CONSTRAINT cars_FK")
+    first = sql.index("CREATE TABLE teams")
     code(doc, sql[first:fk])
     para(doc)
     figure(doc, 2, *FIGURES[1])
@@ -292,8 +292,8 @@ def main():
               "спонсоров и трасс (teams_name_UQ, sponsors_name_UQ, tracks_name_UQ) — и ограничения "
               "проверки: год болида от 1950 до 2100 (cars_year_CHK), неотрицательный бюджет спонсора "
               "(sponsors_budget_CHK), положительная длина трассы (tracks_length_CHK).")
-    start = sql.index("-------------------------------------------\n-- Определение внешних ключей")
-    end = sql.index("-------------------------------------------\n-- Индексы")
+    start = sql.index("ALTER TABLE cars\nADD CONSTRAINT cars_FK")
+    end = sql.index("CREATE INDEX")
     code(doc, sql[start:end])
     para(doc)
     figure(doc, 3, *FIGURES[2])
@@ -308,7 +308,7 @@ def main():
               "первичном ключе (car_ID, part_ID). Всего в базе 14 индексов (таблица 9).")
     para(doc, "Таблица 9 — Индексы", indent=False, size=12)
     table(doc, ("Индекс", "Столбцы", "Как создан"), INDEXES, widths=(6.5, 4.5, 5.5))
-    code(doc, sql[end:sql.index("-------------------------------------------\n-- Комментарии")])
+    code(doc, sql[end:sql.index("COMMENT ON TABLE")])
     para(doc)
     figure(doc, 5, *FIGURES[4])
 
